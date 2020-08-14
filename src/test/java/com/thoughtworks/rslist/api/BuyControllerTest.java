@@ -14,6 +14,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.Matchers.hasKey;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -37,13 +38,30 @@ class BuyControllerTest {
     public void should_get_BuyList() throws Exception {
         BuyEventDto buyEventDto=BuyEventDto.builder().name("可乐1").price(10).unit("瓶").imgUrl("/see").build();
         buyEventRepository.save(buyEventDto);
-        mockMvc
-                .perform(get("/buy/list"))
+        mockMvc.perform(get("/buy/list"))
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].name", is("可乐1")))
                 .andExpect(jsonPath("$[0].price", is(10.0)))
                 .andExpect(jsonPath("$[0].unit", is("瓶")))
                 .andExpect(jsonPath("$[0].imgUrl", is("/see")))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    public void should_delete_BuyEvent() throws Exception {
+        BuyEventDto buyEventDto=BuyEventDto.builder().name("可乐1").price(10).unit("瓶").imgUrl("/see").build();
+        buyEventRepository.save(buyEventDto);
+        buyEventDto=BuyEventDto.builder().name("可乐2").price(12).unit("瓶").imgUrl("/see").build();
+        buyEventRepository.save(buyEventDto);
+        mockMvc.perform(delete("/buy/delete/'可乐1'"))
+                .andExpect(status().isOk());
+        mockMvc.perform(get("/buy/list"))
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$[0].name", is("可乐2")))
+                .andExpect(jsonPath("$[0].price", is(12.0)))
+                .andExpect(jsonPath("$[0].unit", is("瓶")))
+                .andExpect(jsonPath("$[0].imgUrl", is("/see")))
+                .andExpect(status().isOk());
+
     }
 }

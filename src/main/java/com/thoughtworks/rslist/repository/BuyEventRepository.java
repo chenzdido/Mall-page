@@ -8,4 +8,5 @@ import java.util.List;
 public interface BuyEventRepository extends CrudRepository<BuyEventDto, Integer> {
     @Override
     List<BuyEventDto> findAll();
+    void deleteByName(String name);
 }
